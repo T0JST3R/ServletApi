@@ -7,13 +7,30 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
-@WebServlet(name = "Hello" , urlPatterns = "/api/*")
+@WebServlet(name = "Hello", urlPatterns = "/api/*")
 public class HelloServlet extends HttpServlet {
-    Logger logger = LoggerFactory.getLogger(HelloServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(HelloServlet.class);
+    private HelloService helloService;
+
+    public HelloServlet() {
+        this(new HelloService());
+    }
+
+    public HelloServlet(HelloService helloService) {
+        this.helloService = helloService;
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.info("request got");
-        resp.getWriter().write("HelloDearUser");
+        final String NAME_PARAM = "name";
+        final String LANG_PARAM = "lang";
+        logger.info("got request with parameters" + req.getParameterMap());
+
+        String name = req.getParameter(NAME_PARAM);
+        String lang = req.getParameter(LANG_PARAM);
+
+        resp.getWriter().write(helloService.prepareGreeting(name, lang));
     }
 }
